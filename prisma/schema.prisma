@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model collect {
+  id         Int     @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  is_delete  Int     @default(0) @db.TinyInt
+  product    product @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "collect_ibfk_1")
+  user       user    @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "collect_ibfk_2")
+
+  @@index([product_id], map: "FK_collect_product")
+  @@index([user_id], map: "FK_collect_user")
+}
+
+model order {
+  id            Int       @id @default(autoincrement())
+  order_id      BigInt
+  user_id       Int
+  product_id    Int
+  product_num   Int
+  product_price Float
+  order_time    DateTime? @default(dbgenerated("(now())")) @db.Timestamp(0)
+  product       product   @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "order_ibfk_1")
+  user          user      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "order_ibfk_2")
+
+  @@index([product_id], map: "FK_order_product")
+  @@index([user_id], map: "FK_order_user")
+}
+
+model product {
+  id               Int               @id @default(autoincrement())
+  name             String            @db.Char(100)
+  title            String            @db.Char(30)
+  introduce        String            @db.Text
+  price            Float
+  selling_price    Float
+  sales            Int               @default(0)
+  category_id      Int
+  product_category product_category  @relation(fields: [category_id], references: [id], onDelete: Cascade, map: "product_ibfk_1")
+  collect          collect[]
+  order            order[]
+  product_picture  product_picture[]
+  shoppingcart     shoppingcart[]
+
+  @@index([category_id], map: "FK_product_category")
+}
+
+model product_category {
+  id      Int       @id @default(autoincrement())
+  name    String    @db.Char(20)
+  product product[]
+}
+
+model product_picture {
+  id         Int     @id @default(autoincrement())
+  product_id Int
+  pic_url    String  @db.Char(200)
+  product    product @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "product_picture_ibfk_1")
+
+  @@index([product_id], map: "FK_picture_product")
+}
+
+model shoppingcart {
+  id         Int     @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  num        Int
+  product    product @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "shoppingcart_ibfk_1")
+  user       user    @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "shoppingcart_ibfk_2")
+
+  @@index([product_id], map: "FK_shoppingCart_product")
+  @@index([user_id], map: "FK_shoppingCart_user")
+}
+
+model user {
+  id           Int            @id @default(autoincrement())
+  username     String         @unique(map: "user.username_unique") @db.Char(40)
+  password     String         @db.Char(40)
+  collect      collect[]
+  order        order[]
+  shoppingcart shoppingcart[]
+}
