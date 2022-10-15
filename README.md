@@ -1,3 +1,8 @@
+#xiaomiMall 后台
+
+主要采用了 nestJs 和 prisma 来构建后台和数据库
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
