@@ -1,4 +1,4 @@
-import { IsNotEmpty, Length} from 'class-validator'
+import { IsNotEmpty, Length } from 'class-validator'
 
 export class LoginAuthDto {
   @IsNotEmpty({ message: '账号不能为空' })

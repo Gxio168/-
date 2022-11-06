@@ -1,4 +1,10 @@
-import { ArgumentsHost, BadRequestException, Catch, ExceptionFilter, HttpException } from '@nestjs/common'
+import {
+  ArgumentsHost,
+  BadRequestException,
+  Catch,
+  ExceptionFilter,
+  HttpException
+} from '@nestjs/common'
 import type { Response, Request } from 'express'
 
 @Catch(HttpException)
@@ -12,13 +18,11 @@ export class ValidateExceptionFilter implements ExceptionFilter {
     if (exception instanceof BadRequestException) {
       return response.json(exception.getResponse())
     }
-    return response
-      .status(status)
-      .json({
-        statusCode: status,
-        timestamp: new Date().toString(),
-        message: exception.message,
-        path: request.url,
-      });
+    return response.status(status).json({
+      statusCode: status,
+      timestamp: new Date().toString(),
+      message: exception.message,
+      path: request.url
+    })
   }
 }

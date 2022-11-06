@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Req, Res, Session } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Body, Controller, Get, Post, Req, Res, Session } from '@nestjs/common'
+import { AppService } from './app.service'
 import { utilsService } from './utils/utils.service'
 import { Response, Request } from 'express'
 
@@ -8,7 +8,7 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly utilsService: utilsService
-  ) { }
+  ) {}
 
   @Get('getCode')
   getCode(@Session() session, @Res() res: Response) {
@@ -25,6 +25,4 @@ export class AppController {
     Object.defineProperty
     return this.utilsService.getCarousel()
   }
-
-
 }

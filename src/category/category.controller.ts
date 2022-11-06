@@ -1,9 +1,9 @@
-import { Controller, Get, Param, Query, Post, Body } from '@nestjs/common';
-import { CategoryService } from './category.service';
+import { Controller, Get, Param, Query, Post, Body } from '@nestjs/common'
+import { CategoryService } from './category.service'
 
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) { }
+  constructor(private readonly categoryService: CategoryService) {}
 
   @Get()
   getAllCategory() {
@@ -21,7 +21,7 @@ export class CategoryController {
   }
 
   @Post(':page')
-  fuzzyFind(@Param('page') page, @Body('key') key:string) {
+  fuzzyFind(@Param('page') page, @Body('key') key: string) {
     return this.categoryService.fuzzyFind(key, +page)
   }
 }

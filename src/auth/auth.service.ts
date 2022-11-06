@@ -1,7 +1,7 @@
-import { Injectable, BadRequestException, ForbiddenException, Req, Body } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { LoginAuthDto } from './dto/login-auth.dto';
+import { Injectable, BadRequestException, ForbiddenException, Req, Body } from '@nestjs/common'
+import { PrismaClient } from '@prisma/client'
+import { CreateAuthDto } from './dto/create-auth.dto'
+import { LoginAuthDto } from './dto/login-auth.dto'
 import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
@@ -23,10 +23,12 @@ export class AuthService extends PrismaClient {
     })
     delete user.password
     return {
-      token: 'Bearer ' + await this.jwt.signAsync({
-        username: user.username,
-        sub: user.id
-      }),
+      token:
+        'Bearer ' +
+        (await this.jwt.signAsync({
+          username: user.username,
+          sub: user.id
+        }))
     }
   }
 
@@ -44,12 +46,14 @@ export class AuthService extends PrismaClient {
   }
 
   // 返回 Jwt
-  async token(user: { username: string, id: number }) {
+  async token(user: { username: string; id: number }) {
     return {
-      token: 'Bearer ' + await this.jwt.signAsync({
-        username: user.username,
-        sub: user.id
-      }),
+      token:
+        'Bearer ' +
+        (await this.jwt.signAsync({
+          username: user.username,
+          sub: user.id
+        }))
     }
   }
 
@@ -87,14 +91,18 @@ export class AuthService extends PrismaClient {
   }
   // 向购物车添加商品
   async addToShopCart(@Req() req) {
-    const { user, body: { id } } = req
+    const {
+      user,
+      body: { id }
+    } = req
     const nums = await this.shoppingcart.findFirst({
       where: {
         user_id: user.id,
-        product_id: +id,
+        product_id: +id
       }
     })
-    if (nums) {   // 如果购物车已经有了该数据
+    if (nums) {
+      // 如果购物车已经有了该数据
       await this.shoppingcart.update({
         data: {
           num: nums.num + 1
@@ -103,7 +111,8 @@ export class AuthService extends PrismaClient {
           id: nums.id
         }
       })
-    } else {    // 如果是第一次进入购物车
+    } else {
+      // 如果是第一次进入购物车
       await this.shoppingcart.create({
         data: {
           user_id: user.id,
@@ -120,7 +129,9 @@ export class AuthService extends PrismaClient {
 
   // 从购物车移除商品
   async removeFromShopCart(@Req() req) {
-    const { body: { id } } = req
+    const {
+      body: { id }
+    } = req
     await this.shoppingcart.delete({
       where: {
         id: +id
@@ -133,7 +144,9 @@ export class AuthService extends PrismaClient {
 
   // 修改购物车商品数量
   async changeShopNum(@Req() req) {
-    const { body: { id, num } } = req
+    const {
+      body: { id, num }
+    } = req
     await this.shoppingcart.update({
       data: {
         num: +num
@@ -149,9 +162,11 @@ export class AuthService extends PrismaClient {
 
   // 向订单中添加数据
   async addToOrder(@Req() req) {
-    const  { body: { checkedShop } }  = req
+    const {
+      body: { checkedShop }
+    } = req
     const time = Date.now()
-    const result = checkedShop.map(item => {
+    const result = checkedShop.map((item) => {
       const product: any = {}
       product.order_id = parseInt(`${req.user.id + 10000}${time}`)
       product.user_id = req.user.id
@@ -160,17 +175,17 @@ export class AuthService extends PrismaClient {
       product.product_price = item.product.selling_price
       return product
     })
-    const ids = checkedShop.map(item => item.id);
+    const ids = checkedShop.map((item) => item.id)
     await this.order.createMany({
       data: result
     })
     await this.shoppingcart.deleteMany({
-      where: { 
+      where: {
         user_id: req.user.id,
         id: {
           in: ids
         }
-       }
+      }
     })
     return {
       message: '添加成功'
@@ -182,7 +197,7 @@ export class AuthService extends PrismaClient {
     const result = await this.order.findMany({
       take: 50,
       where: {
-        user_id: req.user.id,
+        user_id: req.user.id
       },
       orderBy: {
         order_id: 'desc'
@@ -201,29 +216,35 @@ export class AuthService extends PrismaClient {
         }
       }
     })
-    result.forEach(item => {
-      (item.order_id) = JSON.parse(item.order_id as any)
+    result.forEach((item) => {
+      item.order_id = JSON.parse(item.order_id as any)
     })
     return result
   }
 
   // 加入我的收藏
-  async addToCollect(@Req() req) {  // 判断是否当前在收藏中已存在，存在就改变一下 is_delete 状态， 否则新建一个
-    const { user, body: { id } } = req
+  async addToCollect(@Req() req) {
+    // 判断是否当前在收藏中已存在，存在就改变一下 is_delete 状态， 否则新建一个
+    const {
+      user,
+      body: { id }
+    } = req
     let collect = await this.collect.findFirst({
       where: {
         user_id: user.id,
         product_id: +id
       }
     })
-    if (!collect) {   // 如果当前用户暂不存在该收藏商品
+    if (!collect) {
+      // 如果当前用户暂不存在该收藏商品
       await this.collect.create({
         data: {
           user_id: user.id,
           product_id: +id
         }
       })
-    } else {  // 如果找到了该用户收藏的商品
+    } else {
+      // 如果找到了该用户收藏的商品
       await this.collect.update({
         where: {
           id: collect.id
@@ -266,7 +287,9 @@ export class AuthService extends PrismaClient {
   }
   // 移除出我的收藏
   async removeFromCollect(@Req() req) {
-    const { body: { id } } = req
+    const {
+      body: { id }
+    } = req
     await this.collect.update({
       where: { id: +id },
       data: {
@@ -279,7 +302,9 @@ export class AuthService extends PrismaClient {
   }
   // 判断当前商品是否在用户收藏中
   async checkCollect(@Req() req) {
-    const { body: { id } } = req
+    const {
+      body: { id }
+    } = req
     let result = await this.collect.findFirst({
       where: {
         user_id: req.user.id,
@@ -297,4 +322,4 @@ export class AuthService extends PrismaClient {
       }
     }
   }
-} 
+}

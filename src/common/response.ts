@@ -9,12 +9,14 @@ interface Data<T> {
 @Injectable()
 export class Response<T> implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<Data<T>> {
-    return next.handle().pipe(map(data => {
-      return {
-        data,
-        statusCode: 200,
-        message: '成功',
-      }
-    }))
+    return next.handle().pipe(
+      map((data) => {
+        return {
+          data,
+          statusCode: 200,
+          message: '成功'
+        }
+      })
+    )
   }
 }

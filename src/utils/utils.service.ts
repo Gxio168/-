@@ -1,13 +1,12 @@
-import { Injectable, Session, Res, Req, BadRequestException } from '@nestjs/common';
+import { Injectable, Session, Res, Req, BadRequestException } from '@nestjs/common'
 import * as svgCaptcha from 'svg-captcha'
 import { Response, Request } from 'express'
 import { PrismaService } from '../prisma/prisma.service'
 import { join } from 'path'
 
-
 @Injectable()
 export class utilsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
   // 生成验证码
   generateCode(@Session() session, @Res() res: Response) {
     const captcha = svgCaptcha.create({
@@ -16,8 +15,8 @@ export class utilsService {
       height: 60,
       background: '#fbab7e'
     })
-    session.code = captcha.text;
-    res.type('svg');
+    session.code = captcha.text
+    res.type('svg')
     res.status(200).send(captcha.data)
   }
 
@@ -34,7 +33,7 @@ export class utilsService {
 
   // 返回轮播图信息
   getCarousel() {
-    const carouselImgs = {};
+    const carouselImgs = {}
     for (let i = 0; i < 4; i++) {
       carouselImgs[`${i}`] = {
         id: i,
@@ -45,6 +44,4 @@ export class utilsService {
       carouselImgs
     }
   }
-
-
 }
